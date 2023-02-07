@@ -1,0 +1,172 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Exchange Rate Test"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/transactions": {
+      "get": {
+        "summary": "List transactions made by a specific user",
+        "operationId": "listTransactions",
+        "tags": [
+          "transactions"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "User identifier",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of transactions made by specified user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transactions"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a conversion transaction",
+        "operationId": "createTransaction",
+        "tags": [
+          "transactions"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "type": "number"
+                },
+                "initialCurrency": {
+                  "type": "string",
+                  "enum": ["USD", "BRL", "EUR", "JPY"]
+                },
+                "initialAmount": {
+                  "type": "number"
+                },
+                "currency": {
+                  "type": "string",
+                  "enum": ["USD", "BRL", "EUR", "JPY"]
+                }
+              },
+              "required": ["userId", "initialCurrency", "initialAmount", "currency"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The transaction created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Transaction": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "transactionId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "integer"
+          },
+          "initialCurrency": {
+            "type": "string"
+          },
+          "initialAmount": {
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "exchangeRate": {
+            "type": "number"
+          },
+          "transactionDate": {
+            "type": "string"
+          }
+        }
+      },
+      "Transactions": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "$ref": "#/components/schemas/Transaction"
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
